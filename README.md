@@ -23,7 +23,7 @@ Bright Data already runs that infrastructure and exposes it over MCP, so an agen
 Run:
 
 ```bash
-npx create-mastra@latest --template https://github.com/danielshashko/template-bright-data-agent
+npx create-mastra@latest --template https://github.com/danielsha-brd/template-bright-data-agent
 cd template-bright-data-agent
 ```
 
