@@ -1,0 +1,38 @@
+{
+  "name": "template-bright-data-agent",
+  "version": "1.0.0",
+  "description": "A Mastra agent with live web access through the Bright Data MCP server: search, read any public page as Markdown, and pull structured data from sites that block ordinary HTTP clients.",
+  "main": "index.js",
+  "scripts": {
+    "dev": "mastra dev",
+    "build": "mastra build",
+    "start": "mastra start"
+  },
+  "keywords": [
+    "mastra",
+    "bright-data",
+    "mcp",
+    "web-scraping",
+    "agent"
+  ],
+  "author": "",
+  "license": "Apache-2.0",
+  "type": "module",
+  "engines": {
+    "node": ">=22.13.0"
+  },
+  "dependencies": {
+    "@mastra/core": "latest",
+    "@mastra/libsql": "latest",
+    "@mastra/loggers": "latest",
+    "@mastra/mcp": "latest",
+    "@mastra/memory": "latest",
+    "zod": "^4.3.6"
+  },
+  "devDependencies": {
+    "@types/node": "^24.10.9",
+    "dotenv": "^17.3.1",
+    "mastra": "latest",
+    "typescript": "^5.9.3"
+  }
+}
