@@ -1,17 +1,17 @@
 # Bright Data Web Agent
 
-Ask a question about anything that lives on the public web and get an answer built from pages read a moment ago, with every source listed. The agent searches Google, Bing, or Yandex, opens the pages that matter, and reads them as clean Markdown — including the ones that return a CAPTCHA, a bot-detection wall, or a geo-block to an ordinary HTTP client. It ships with a `research-brief` workflow that returns the same research as structured JSON when something downstream needs to consume it. Built with Mastra and the Bright Data MCP server.
+Ask a question about anything that lives on the public web and get an answer built from pages read a moment ago, with every source listed. The agent searches Google, Bing, or Yandex, opens the pages that matter, and reads them as clean Markdown, including the ones that return a CAPTCHA, a bot-detection wall, or a geo-block to an ordinary HTTP client. It ships with a `research-brief` workflow that returns the same research as structured JSON when something downstream needs to consume it. Built with Mastra and the Bright Data MCP server.
 
 ## Why we built this
 
-Every agent that touches the web eventually hits the same wall. The built-in fetch tool works fine in development, then goes to production and starts returning CAPTCHA pages, 403s, and empty shells where the content used to be. The fix is rarely a better prompt — it is proxy rotation, browser fingerprinting, and retry logic, none of which is the thing you set out to build.
+Every agent that touches the web eventually hits the same wall. The built-in fetch tool works fine in development, then goes to production and starts returning CAPTCHA pages, 403s, and empty shells where the content used to be. The fix is rarely a better prompt. It is proxy rotation, browser fingerprinting, and retry logic, none of which is the thing you set out to build.
 
 Bright Data already runs that infrastructure and exposes it over MCP, so an agent gets it as a set of tools. We wanted a starting point that makes the difference obvious: point this agent at a site that blocks everything else and watch the content come back.
 
 ## Features
 
 - Answers from the live web with a source URL behind every claim, not from training data
-- Reads pages that block ordinary scrapers — bot detection, CAPTCHAs, rate limits, and geo-restrictions are handled on every request
+- Reads pages that block ordinary scrapers, with bot detection, CAPTCHAs, rate limits, and geo-restrictions handled on every request
 - Batches work, searching or reading up to ten pages in a single call
 - Returns structured JSON through the `research-brief` workflow, ready for a database or an API response
 - Adds platform-specific tools with one environment variable, for clean JSON from Amazon, LinkedIn, Crunchbase, and 60+ other sites without parsing HTML
@@ -35,8 +35,8 @@ Copy the example environment file, then fill in the required values:
 cp .env.example .env
 ```
 
-- `BRIGHT_DATA_API_TOKEN` — every web request the agent makes runs through Bright Data. Create a token in your [account settings](https://brightdata.com/cp/setting/users). New accounts include 5,000 requests per month with no credit card.
-- `OPENAI_API_KEY` — the model the agent runs on. Get one at [platform.openai.com](https://platform.openai.com/api-keys).
+- `BRIGHT_DATA_API_TOKEN` powers every web request the agent makes. Create a token in your [account settings](https://brightdata.com/cp/setting/users). New accounts include 5,000 requests per month with no credit card.
+- `OPENAI_API_KEY` is the model the agent runs on. Get one at [platform.openai.com](https://platform.openai.com/api-keys).
 
 ### 3. Start the dev server
 
@@ -61,7 +61,7 @@ BRIGHT_DATA_MCP_GROUPS=ecommerce
 | `ecommerce` | Amazon, Walmart, eBay, Best Buy, Etsy, Google Shopping |
 | `social` | LinkedIn, Instagram, TikTok, YouTube, X, Reddit, Facebook |
 | `business` | Crunchbase, ZoomInfo, Google Maps reviews, Zillow, Booking.com |
-| `browser` | Remote browser automation — click, type, screenshot |
+| `browser` | Remote browser automation: click, type, screenshot |
 | `geo` | ChatGPT, Grok, and Perplexity answers as structured data |
 
 With `ecommerce` enabled, "compare this laptop's price on Amazon, Walmart, and Best Buy" returns three structured product records instead of three pages of HTML.
