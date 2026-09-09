@@ -1,7 +1,7 @@
 import { Agent } from '@mastra/core/agent';
 import { Memory } from '@mastra/memory';
 
-import { brightData } from '../mcp/bright-data';
+import { loadBrightDataTools } from '../mcp/bright-data';
 
 export const webAgent = new Agent({
   id: 'web-agent',
@@ -41,7 +41,7 @@ Check the tools you actually have before planning. Do not assume a tool exists b
   defaultOptions: {
     maxSteps: 50,
   },
-  tools: await brightData.listTools(),
+  tools: await loadBrightDataTools(),
   memory: new Memory({
     options: {
       lastMessages: 20,

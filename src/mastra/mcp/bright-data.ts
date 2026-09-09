@@ -42,3 +42,22 @@ export const brightData = new MCPClient({
     },
   },
 });
+
+/**
+ * Load the Bright Data tool set.
+ *
+ * A wrong or expired token does not fail the connection loudly — it comes back
+ * with an empty tool list, which would leave the agent quietly answering from
+ * memory instead of from the web. Treat that as a startup error.
+ */
+export async function loadBrightDataTools() {
+  const tools = await brightData.listTools();
+
+  if (Object.keys(tools).length === 0) {
+    throw new Error(
+      'Connected to the Bright Data MCP server but received no tools. This usually means BRIGHT_DATA_API_TOKEN is invalid or expired. Check it at https://brightdata.com/cp/setting/users',
+    );
+  }
+
+  return tools;
+}
