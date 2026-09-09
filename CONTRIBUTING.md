@@ -1,11 +1,12 @@
 # Contributing
 
-Issues and pull requests are welcome.
+This repository is auto-generated from the [Mastra monorepo](https://github.com/mastra-ai/mastra). Pull requests opened here will be ignored.
 
-If you find a bug or want to extend the template, open an issue describing what you ran into, or send a pull request against `main`. Keep changes small and focused — this is a teaching example, so readability matters more than completeness.
+To contribute:
 
-Before opening a pull request:
+1. Fork the [Mastra monorepo](https://github.com/mastra-ai/mastra)
+2. Find this template in `templates/template-bright-data-agent`
+3. Make your changes
+4. Open a pull request against the monorepo
 
-1. Run the template from a clean checkout with your own keys.
-2. Confirm the agent and the `research-brief` workflow both still work in Mastra Studio.
-3. Update `README.md` if you changed setup, environment variables, or what the template does.
+A bot syncs accepted changes to this repository.

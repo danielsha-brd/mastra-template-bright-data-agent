@@ -15,49 +15,82 @@ import { MCPClient } from '@mastra/mcp';
  * Note: the hosted server applies one group, and setting a group drops the
  * two batch tools, so leave it empty unless you need a specific platform.
  */
-const token = process.env.BRIGHT_DATA_API_TOKEN;
+const token = process.env.BRIGHT_DATA_API_TOKEN?.trim();
 
-if (!token) {
-  throw new Error(
-    'BRIGHT_DATA_API_TOKEN is not set. Get a free token at https://brightdata.com/cp/setting/users',
-  );
-}
+function buildUrl(apiToken: string) {
+  const url = new URL('https://mcp.brightdata.com/mcp');
+  url.searchParams.set('token', apiToken);
 
-const url = new URL('https://mcp.brightdata.com/mcp');
-url.searchParams.set('token', token);
-
-const group = process.env.BRIGHT_DATA_MCP_GROUPS?.trim();
-if (group) {
-  url.searchParams.set('groups', group);
-}
-
-export const brightData = new MCPClient({
-  id: 'bright-data',
-  servers: {
-    // Tools arrive namespaced by this key, e.g. `brightData_search_engine`.
-    brightData: {
-      url,
-      // Unblocking a protected page can take a while. Give it room.
-      timeout: 120_000,
-    },
-  },
-});
-
-/**
- * Load the Bright Data tool set.
- *
- * A wrong or expired token does not fail the connection loudly — it comes back
- * with an empty tool list, which would leave the agent quietly answering from
- * memory instead of from the web. Treat that as a startup error.
- */
-export async function loadBrightDataTools() {
-  const tools = await brightData.listTools();
-
-  if (Object.keys(tools).length === 0) {
-    throw new Error(
-      'Connected to the Bright Data MCP server but received no tools. This usually means BRIGHT_DATA_API_TOKEN is invalid or expired. Check it at https://brightdata.com/cp/setting/users',
-    );
+  const group = process.env.BRIGHT_DATA_MCP_GROUPS?.trim();
+  if (group) {
+    url.searchParams.set('groups', group);
   }
 
-  return tools;
+  return url;
+}
+
+/**
+ * The server is only registered when a token is present. Without it the client
+ * has no servers, `listTools()` returns `{}`, and the app still starts, so
+ * `mastra dev` opens and tells you what is missing instead of crashing on
+ * import with a stack trace.
+ */
+export const brightData = new MCPClient({
+  id: 'bright-data',
+  servers: token
+    ? {
+        // Tools arrive namespaced by this key, e.g. `brightData_search_engine`.
+        brightData: {
+          url: buildUrl(token),
+          // Unblocking a protected page can take a while. Give it room.
+          timeout: 120_000,
+        },
+      }
+    : {},
+});
+
+const MISSING_TOKEN =
+  'BRIGHT_DATA_API_TOKEN is not set, so the agent has no web tools and will answer from memory. Get a free token at https://brightdata.com/cp/setting/users';
+
+const REJECTED_TOKEN =
+  'Connected to the Bright Data MCP server but received no tools, so the agent will answer from memory. This usually means BRIGHT_DATA_API_TOKEN is invalid or expired. Check it at https://brightdata.com/cp/setting/users';
+
+type BrightDataTools = Awaited<ReturnType<typeof brightData.listTools>>;
+
+let toolsPromise: Promise<BrightDataTools> | undefined;
+
+/**
+ * Load the Bright Data tool set, once, on first use.
+ *
+ * A wrong or expired token does not fail the connection loudly, it comes back
+ * with an empty tool list, which would leave the agent quietly answering from
+ * memory instead of from the web. That case is worth shouting about, so it is
+ * logged as an error even though it does not stop the server.
+ */
+export async function loadBrightDataTools() {
+  toolsPromise ??= (async () => {
+    if (!token) {
+      console.error(MISSING_TOKEN);
+      return {} as BrightDataTools;
+    }
+
+    try {
+      const tools = await brightData.listTools();
+
+      if (Object.keys(tools).length === 0) {
+        console.error(REJECTED_TOKEN);
+      }
+
+      return tools;
+    } catch (error) {
+      console.error(
+        `Could not reach the Bright Data MCP server, so the agent has no web tools: ${
+          error instanceof Error ? error.message : String(error)
+        }`,
+      );
+      return {} as BrightDataTools;
+    }
+  })();
+
+  return toolsPromise;
 }

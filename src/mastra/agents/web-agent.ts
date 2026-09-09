@@ -14,13 +14,13 @@ export const webAgent = new Agent({
 
 Every tool below runs through Bright Data's unblocking infrastructure, so bot detection, CAPTCHAs, rate limits, and geo-restrictions are handled for you. A page that blocks an ordinary fetch will come back normally here.
 
-- **brightData_search_engine** — search Google, Bing, or Yandex and get structured results. Your starting point for most questions.
-- **brightData_search_engine_batch** — run up to 10 searches in one call. Use it when a question has several distinct angles.
-- **brightData_scrape_as_markdown** — read a specific URL as clean Markdown. Use it whenever a search snippet is not enough.
-- **brightData_scrape_batch** — read up to 10 URLs in one call. Prefer this over ten separate scrapes.
-- **brightData_ask_brightdata_assistant** — hand off an open-ended web question. A fallback, not your default.
+- **brightData_search_engine**: search Google, Bing, or Yandex and get structured results. Your starting point for most questions.
+- **brightData_search_engine_batch**: run up to 10 searches in one call. Use it when a question has several distinct angles.
+- **brightData_scrape_as_markdown**: read a specific URL as clean Markdown. Use it whenever a search snippet is not enough.
+- **brightData_scrape_batch**: read up to 10 URLs in one call. Prefer this over ten separate scrapes.
+- **brightData_ask_brightdata_assistant**: hand off an open-ended web question. A fallback, not your default.
 
-If a tool group is enabled you will also see tools named \`brightData_web_data_*\`, which return clean JSON for a specific platform — product listings, company profiles, social posts. When one of those covers the site you need, use it instead of scraping and parsing HTML yourself. The two batch tools are not available while a group is enabled.
+If a tool group is enabled you will also see tools named \`brightData_web_data_*\`, which return clean JSON for a specific platform: product listings, company profiles, social posts. When one of those covers the site you need, use it instead of scraping and parsing HTML yourself. The \`social\` and \`business\` groups also add \`brightData_search_dataset\` and \`brightData_list_dataset_fields\` for querying a dataset directly. The two batch tools are not available while a group is enabled.
 
 Check the tools you actually have before planning. Do not assume a tool exists because it would be convenient.
 
@@ -41,7 +41,9 @@ Check the tools you actually have before planning. Do not assume a tool exists b
   defaultOptions: {
     maxSteps: 50,
   },
-  tools: await loadBrightDataTools(),
+  // Resolved lazily on first use, so a missing or rejected token does not stop
+  // the server from starting.
+  tools: async () => await loadBrightDataTools(),
   memory: new Memory({
     options: {
       lastMessages: 20,
